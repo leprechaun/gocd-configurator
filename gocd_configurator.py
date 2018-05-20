@@ -20,7 +20,15 @@ if "GOCD_TLS_VERIFY" in os.environ:
     if os.environ["GOCD_TLS_VERIFY"] == "false":
         GOCD_TLS_VERIFY = False
 
-configurator = GoCdConfigurator(HostRestClient(GOCD_URL, GOCD_USERNAME, GOCD_PASSWORD, GOCD_TLS, GOCD_TLS_VERIFY))
+configurator = GoCdConfigurator(
+    HostRestClient(
+        GOCD_URL,
+        GOCD_USERNAME,
+        GOCD_PASSWORD,
+        GOCD_TLS,
+        GOCD_TLS_VERIFY
+    )
+)
 
 c = yaml.safe_load(open("gocd-config.yml").read())
 
@@ -35,14 +43,20 @@ admins = security.ensure_admins()
 all_users = []
 
 for auth in c["server"]["auth"]:
-    authentication.ensure_auth_config(auth["name"], auth["type"], auth["properties"])
+    authentication.ensure_auth_config(
+        auth["name"],
+        auth["type"],
+        auth["properties"]
+    )
 
 for admin in c["server"]["users"]["admins"]:
     admins.add_user(name=admin)
 
 for project in c["projects"]:
     for i in range(len(project["pipeline_groups"])):
-        project["pipeline_groups"][i] = configurator.ensure_pipeline_group(project["pipeline_groups"][i])
+        project["pipeline_groups"][i] = configurator.ensure_pipeline_group(
+                                            project["pipeline_groups"][i]
+                                        )
     for group in project["groups"]:
         group["name"] = project["name"] + "-" + group["name"]
         if "permissions" not in group:
@@ -60,20 +74,21 @@ for project in c["projects"]:
 
         all_users = all_users + group["members"]
 
-
         for pg in project["pipeline_groups"]:
             pg.ensure_authorization().ensure_view().add_role("viewers")
             if "view" in permissions:
                 pg.ensure_authorization().ensure_view().add_role(group["name"])
 
             if "operate" in permissions:
-                pg.ensure_authorization().ensure_operate().add_role(group["name"])
+                pg.ensure_authorization().ensure_operate().add_role(
+                    group["name"]
+                )
 
             if "admin" in permissions:
-                pg.ensure_authorization().ensure_admins().add_role(group["name"])
+                pg.ensure_authorization().ensure_admins().add_role(
+                    group["name"]
+                )
 
-
-    # config-repos
     for repo in project["repos"]:
         CRs.ensure_config_repo(repo["url"], "yaml.config.plugin")
 
