@@ -98,7 +98,8 @@ roles.ensure_role(
     users=set(all_users + c["server"]["users"]["viewers"])
 )
 
-configurator.save_updated_config(DRY_RUN, True)
+configurator.save_updated_config(DRY_RUN, DRY_RUN)
 
-call(["cat", "config-after.xml"])
-call(["diff", "config-before.xml", "config-after.xml"])
+if DRY_RUN:
+    call(["cat", "config-after.xml"])
+    call(["diff", "config-before.xml", "config-after.xml"])
