@@ -3,6 +3,7 @@
 import sys
 import os
 import yaml
+from subprocess import call
 from gomatic import *
 
 GOCD_URL = os.environ["GOCD_URL"]
@@ -97,4 +98,7 @@ roles.ensure_role(
     users=set(all_users + c["server"]["users"]["viewers"])
 )
 
-configurator.save_updated_config(DRY_RUN, DRY_RUN)
+configurator.save_updated_config(DRY_RUN, True)
+
+call(["cat", "config-after.xml"])
+call(["diff", "config-before.xml", "config-after.xml"])
