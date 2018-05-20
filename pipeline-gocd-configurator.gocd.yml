@@ -1,0 +1,42 @@
+pipelines:
+  gocd-configurator-build:
+    group: gocd-confgurator
+    label_template: "0.1-${COUNT}-${git[:8]}"
+    locking: "off"
+    timer:
+      spec: "* * * * * ? *"
+      only_on_changes: yes
+    materials:
+      git:
+        type: configrepo
+    environment_variables:
+      REGISTRY_HOST: registry.k8s.fscker.org
+      REGISTRY_IMAGE: ci-stuff/gocd-configurator
+    stages:
+      - codestyle:
+          tasks:
+            - script: |
+                set -e
+
+                ./auto/codestyle
+
+      - build-image:
+          tasks:
+            - script: |
+                docker build --pull -t ${REGISTRY_HOST}/${REGISTRY_IMAGE}:${GO_PIPELINE_LABEL} \
+                  --build-arg=BUILD_NUMBER=${GO_PIPELINE_COUNTER} \
+                  --build-arg=GIT_COMMIT=${GO_REVISION_GIT} \
+                  --build-arg=VERSION=${GO_PIPELINE_LABEL} \
+                  --label version=${GO_PIPELINE_LABEL} \
+                  --label git-repo=$(git remote -v | head -n 1 | awk '{ print $2 }') \
+                  --label git-commit=${GO_REVISION_GIT} \
+                  --label go-pipeline=${GO_PIPELINE_NAME} \
+                  --label go-pipeline-counter=${GO_PIPELINE_COUNTER} \
+                  --label go-pipeline-stage=${GO_STAGE_NAME} \
+                  --label go-pipeline-stage-counter=${GO_STAGE_COUNTER} \
+                  --label go-pipeline-job=${GO_JOB_NAME} \
+                  .
+
+                docker tag ${REGISTRY_HOST}/${REGISTRY_IMAGE}:${GO_PIPELINE_LABEL} ${REGISTRY_HOST}/${REGISTRY_IMAGE}:latest
+                docker push ${REGISTRY_HOST}/${REGISTRY_IMAGE}:${GO_PIPELINE_LABEL}
+                docker push ${REGISTRY_HOST}/${REGISTRY_IMAGE}:latest
