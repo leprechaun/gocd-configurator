@@ -1,6 +1,6 @@
 pipelines:
   gocd-configurator-build:
-    group: gocd-confgurator
+    group: gocd-configurator
     label_template: "0.1-${COUNT}-${git[:8]}"
     locking: "off"
     timer:
