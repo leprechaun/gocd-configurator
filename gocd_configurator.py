@@ -6,6 +6,12 @@ import yaml
 from subprocess import call
 from gomatic import *
 
+
+if len(sys.argv) < 2:
+    sys.exit('Usage: %s $CONFIG_FILE.yml' % sys.argv[0])
+
+CONFIG_FILE = sys.argv[1]
+
 GOCD_URL = os.environ["GOCD_URL"]
 GOCD_USERNAME = os.environ["GOCD_USERNAME"]
 GOCD_PASSWORD = os.environ["GOCD_PASSWORD"]
@@ -31,7 +37,7 @@ configurator = GoCdConfigurator(
     )
 )
 
-c = yaml.safe_load(open("gocd-config.yml").read())
+c = yaml.safe_load(open(CONFIG_FILE).read())
 
 CRs = configurator.ensure_replacement_of_config_repos()
 configurator.remove_all_pipeline_groups()
