@@ -8,4 +8,4 @@ RUN chmod 755 /usr/local/bin/gocd_configurator
 
 WORKDIR /tmp
 
-CMD ["python", "/usr/local/bin/gocd_configurator"]
+CMD ["python", "/usr/local/bin/gocd_configurator", "gocd-config.yml"]
