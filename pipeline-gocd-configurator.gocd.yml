@@ -11,7 +11,7 @@ pipelines:
         type: configrepo
     environment_variables:
       REGISTRY_HOST: registry.k8s.fscker.org
-      REGISTRY_IMAGE: ci-stuff/gocd-configurator
+      REGISTRY_IMAGE: gocd/configurator
     stages:
       - codestyle:
           tasks:
