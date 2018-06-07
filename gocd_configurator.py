@@ -83,9 +83,6 @@ for project in c["projects"]:
 
         for pg in project["pipeline_groups"]:
             pg.ensure_authorization().ensure_view().add_role("viewers")
-            if "view" in permissions:
-                pg.ensure_authorization().ensure_view().add_role(group["name"])
-
             if "operate" in permissions:
                 pg.ensure_authorization().ensure_operate().add_role(
                     group["name"]
