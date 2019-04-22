@@ -46,7 +46,6 @@ security = configurator.ensure_replacement_of_security()
 roles = security.ensure_replacement_of_roles()
 authentication = security.ensure_replacement_of_auth_configs()
 admins = security.ensure_admins()
-elastic_agents = configurator.ensure_elastic().ensure_replacement_of_profiles()
 
 all_users = []
 
@@ -102,15 +101,19 @@ roles.ensure_role(
     users=set(all_users + c["server"]["users"]["viewers"])
 )
 
-for profile in c["elastic-agent-profiles"]:
-    elastic_agents.ensure_profile(
-      profile_id=profile,
-      plugin_id=c["elastic-agent-profiles"][profile]["plugin"],
-      properties=c["elastic-agent-profiles"][profile]["properties"]
-    )
+
+if 'elastic-agent-profiles' in c.keys():
+    elastic_agents = configurator.ensure_elastic().ensure_replacement_of_profiles()
+    for profile in c["elastic-agent-profiles"]:
+        elastic_agents.ensure_profile(
+          profile_id=profile,
+          plugin_id=c["elastic-agent-profiles"][profile]["plugin"],
+          properties=c["elastic-agent-profiles"][profile]["properties"]
+        )
 
 configurator.save_updated_config(DRY_RUN, DRY_RUN)
 
 if DRY_RUN:
+    # pass
     call(["cat", "config-after.xml"])
     call(["diff", "config-before.xml", "config-after.xml"])
