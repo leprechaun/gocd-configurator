@@ -102,7 +102,7 @@ roles.ensure_role(
 )
 
 
-if 'elastic-agent-profiles' in c.keys():
+if 'elastic-agent-profiles' in c.keys() and len(c['elastic-agent-profiles'].keys()) > 0:
     elastic_agents = configurator.ensure_elastic().ensure_replacement_of_profiles()
     for profile in c["elastic-agent-profiles"]:
         elastic_agents.ensure_profile(
